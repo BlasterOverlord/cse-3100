@@ -9,8 +9,12 @@ const availableCats = [
   { name: 'Simba', age: '2', breed: 'Bengal' },
 ];
 
+const breeds = ['Sphynx', 'Peterbald', 'Birman', 'Abyssinian', 'Persian', 'Bengal', 'Siamese'];
+
 export default function AvailableCats() {
   const [cats, setCats] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedBreed, setSelectedBreed] = useState('');
 
   useEffect(() => {
     // Fetch cat images from an API endpoint and assign it to the featuredCats list
@@ -31,13 +35,35 @@ export default function AvailableCats() {
     fetchCatImages();
   }, []);
 
+  const filteredCats = cats.filter((cat) => {
+    const matchesSearch = cat.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesBreed = selectedBreed == '' || cat.breed == selectedBreed;
+    return matchesSearch && matchesBreed;
+  });
+
   return (
     <section className="text-center mt-4">
       <h2>Available Cats</h2>
       <p>Meet our adorable cats looking for their forever home!</p>
 
+      <div className="d-flex justify-content-between mt-4">
+        <div>
+          <input type="text" className="form-control" placeholder="search by name" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        </div>
+        <div>
+          <select className="form-select" value={selectedBreed} onChange={(e) => setSelectedBreed(e.target.value)}>
+            <option value="">Select Breed</option>
+            {breeds.map((breed) => (
+              <option key={breed} value={breed}>
+                {breed}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <div className="mt-2 row g-4 cats-container" id="cats-container">
-        {cats.map((cat, i) => (
+        {filteredCats.map((cat, i) => (
           <div key={i} className="col-md-4">
             <div className="cat-card">
               <img src={cat.image} alt={cat.name} className="img-fluid mb-2" style={{ borderRadius: '8px', height: '200px', objectFit: 'cover' }} />
